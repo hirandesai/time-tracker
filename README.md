@@ -7,8 +7,8 @@ This is a very simple tool to track time.
 Here is the screenshot:
 ![alt text](https://github.com/hirandesai/time-tracker/blob/master/tracker_screenshot.png?raw=true)
 
-#Pre-requivisites
+# Pre-requivisites
 * .NET Framework 4.0 or later
 
-#Note
+# Note
 * Current application being very simple does not require any installer to be installed. Simply download the "releases> latest .exe" and that should work.
