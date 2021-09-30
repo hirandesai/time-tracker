@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +19,7 @@ namespace Tracker
         private string previousText;
         private DataTable tableSource;
         private Timer timer;
-
+        private ILogger logger;
         public Tracker()
         {
             InitializeComponent();
@@ -26,12 +28,43 @@ namespace Tracker
             tableSource = new DataTable();
             tableSource.Columns.Add(new DataColumn("Work Item"));
             tableSource.Columns.Add(new DataColumn("Minutes"));
+            tableSource.RowChanged += TableSource_RowChanged;
+
             grvTimeCaptureHistory.DataSource = tableSource;
 
             timer = new Timer();
             timer.Tick += Timer_Tick;
             timer.Interval = 1000;
             timer.Start();
+
+            logger = new LoggerConfiguration()
+                          .MinimumLevel.Debug()
+                          .WriteTo.File(Path.Combine(Application.StartupPath,"log.txt"), rollingInterval: RollingInterval.Day)
+                          .CreateLogger();
+        }
+
+        private void TableSource_RowChanged(object sender, DataRowChangeEventArgs e)
+        {
+            if (e.Action == DataRowAction.Add)
+            {
+                var rowData = e.Row;
+                logger.Information($"Tracked: {rowData[0]}, {rowData[1]}");
+            }
+            else if(e.Action == DataRowAction.Change)
+            {
+                var rowData = e.Row;
+                logger.Information($"Tracked but Updated: {rowData[0]}, {rowData[1]}");
+            }
+            else if (e.Action == DataRowAction.Delete)
+            {
+                var rowData = e.Row;
+                logger.Information($"Tracked but Deleted: {rowData[0]}, {rowData[1]}");
+            }
+            else
+            {
+                var rowData = e.Row;
+                logger.Information($"Tracked but Unknown: {rowData[0]}, {rowData[1]}");
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
