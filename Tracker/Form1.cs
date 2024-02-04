@@ -39,7 +39,9 @@ namespace Tracker
 
             logger = new LoggerConfiguration()
                           .MinimumLevel.Debug()
-                          .WriteTo.File(Path.Combine(Application.StartupPath,"log.txt"), rollingInterval: RollingInterval.Day)
+                          .WriteTo.File(path: Path.Combine(Application.StartupPath, "log.txt"), 
+                                        outputTemplate: "{Message:lj}{NewLine}",
+                                        rollingInterval: RollingInterval.Day)
                           .CreateLogger();
         }
 
@@ -48,22 +50,22 @@ namespace Tracker
             if (e.Action == DataRowAction.Add)
             {
                 var rowData = e.Row;
-                logger.Information($"Tracked: {rowData[0]}, {rowData[1]}");
+                logger.Information($"{rowData[0]} {rowData[1]}");
             }
-            else if(e.Action == DataRowAction.Change)
+            else if (e.Action == DataRowAction.Change)
             {
                 var rowData = e.Row;
-                logger.Information($"Tracked but Updated: {rowData[0]}, {rowData[1]}");
+                logger.Information($"Updated: {rowData[0]} {rowData[1]}");
             }
             else if (e.Action == DataRowAction.Delete)
             {
                 var rowData = e.Row;
-                logger.Information($"Tracked but Deleted: {rowData[0]}, {rowData[1]}");
+                logger.Information($"Deleted: {rowData[0]} {rowData[1]}");
             }
             else
             {
                 var rowData = e.Row;
-                logger.Information($"Tracked but Unknown: {rowData[0]}, {rowData[1]}");
+                logger.Information($"Unknown: {rowData[0]} {rowData[1]}");
             }
         }
 
@@ -88,7 +90,7 @@ namespace Tracker
             {
                 var row = tableSource.NewRow();
                 row[0] = txtMessage.Text;
-                row[1] = watcher.Elapsed.TotalMinutes;
+                row[1] = Math.Round(watcher.Elapsed.TotalMinutes, 0);
                 tableSource.Rows.Add(row);
             }
             watcher.Reset();
@@ -105,7 +107,7 @@ namespace Tracker
             {
                 var row = tableSource.NewRow();
                 row[0] = txtMessage.Text;
-                row[1] = watcher.Elapsed.TotalMinutes;
+                row[1] = Math.Round(watcher.Elapsed.TotalMinutes, 0);
                 tableSource.Rows.Add(row);
 
                 previousText = string.Empty;

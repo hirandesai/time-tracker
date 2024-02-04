@@ -1,3 +1,6 @@
 /.vs/Tracker/v15
 /Tracker/bin/Debug
 /Tracker/obj/Debug
+/.vs
+/packages
+/Tracker/.vs
